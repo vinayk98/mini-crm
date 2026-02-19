@@ -79,7 +79,7 @@ for (let i = 1; i <= 1000; i++) {
     phone: `9${Math.floor(100000000 + Math.random() * 900000000)}`,
     status: statuses[Math.floor(Math.random() * statuses.length)],
     source: sources[Math.floor(Math.random() * sources.length)],
-    company: companies[Math.floor(Math.random() * companies.length)], // ✅ ADD THIS
+    company: companies[Math.floor(Math.random() * companies.length)],
     assignedTo: Math.random() > 0.5 ? 2 : 3,
     createdAt: createdDate.toISOString(),
   });
@@ -87,9 +87,14 @@ for (let i = 1; i <= 1000; i++) {
 
 const db = {
   users: [
-    { id: 1, email: "admin@gmail.com", password: "1234", role: "admin" },
-    { id: 2, email: "sales@gmail.com", password: "1234", role: "sales" },
-    { id: 3, email: "manager@gmail.com", password: "1234", role: "manager" },
+    { id: 1, email: "admin@gmail.com", password: "Admin@123", role: "admin" },
+    { id: 2, email: "sales@gmail.com", password: "Sales@123", role: "sales" },
+    {
+      id: 3,
+      email: "manager@gmail.com",
+      password: "Manager@123",
+      role: "manager",
+    },
   ],
   leads,
 };

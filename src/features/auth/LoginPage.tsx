@@ -31,13 +31,24 @@ export default function LoginPage() {
     setLoading(true);
 
     await new Promise((r) => setTimeout(r, 600));
-
-    // Demo credentials
     if (
-      (email === "admin@crm.com" && password === "admin123") ||
-      (email === "user@crm.com" && password === "user123")
+      (email === "admin@gmail.com" && password === "Admin@123") ||
+      (email === "sales@gmail.com" && password === "Sales@123") ||
+      (email === "manager@gmail.com" && password === "Manager@123")
     ) {
-      localStorage.setItem("user", email);
+      let role = "";
+
+      if (email === "admin@gmail.com") {
+        role = "admin";
+      } else if (email === "sales@gmail.com") {
+        role = "sales";
+      } else if (email === "manager@gmail.com") {
+        role = "manager";
+      }
+
+      localStorage.setItem("role", role);
+      localStorage.setItem("email", email);
+
       navigate("/leads");
     } else {
       setError("Invalid email or password.");
@@ -61,12 +72,18 @@ export default function LoginPage() {
           <div className="space-y-4">
             <div className="bg-slate-800 p-4 rounded-lg">
               <p className="text-xs text-slate-400">Admin Demo</p>
-              <p className="text-sm font-mono">admin@crm.com / admin123</p>
+              <p className="text-sm font-mono">admin@gmail.com / Admin@123</p>
             </div>
 
             <div className="bg-slate-800 p-4 rounded-lg">
-              <p className="text-xs text-slate-400">User Demo</p>
-              <p className="text-sm font-mono">user@crm.com / user123</p>
+              <p className="text-xs text-slate-400">Sales Demo</p>
+              <p className="text-sm font-mono">sales@gmail.com / Sales@123</p>
+            </div>
+            <div className="bg-slate-800 p-4 rounded-lg">
+              <p className="text-xs text-slate-400">Manager Demo</p>
+              <p className="text-sm font-mono">
+                manager@gmail.com / Manager@123
+              </p>
             </div>
           </div>
         </div>

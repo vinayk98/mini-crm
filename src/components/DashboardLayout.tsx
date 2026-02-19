@@ -19,11 +19,14 @@ export default function DashboardLayout({ children }: LayoutProps) {
     localStorage.setItem("crm_theme", dark ? "dark" : "light");
   }, [dark]);
 
-  // derived theme string for backwards-compatible class names
+  // check used for dark and light mode
   const crm_theme = dark ? "dark" : "light";
 
   const handleLogout = () => {
-    navigate("/login");
+    navigate("/");
+    localStorage.removeItem("email");
+    localStorage.removeItem("role");
+    localStorage.removeItem("crm_theme");
   };
   const isActive = (to: string) =>
     location.pathname === to || location.pathname.startsWith(to + "/");

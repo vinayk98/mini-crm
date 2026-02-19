@@ -161,9 +161,7 @@ function SidebarContent({
           </button>
 
           <button
-            onClick={() =>
-              handleLogout ? handleLogout() : (window.location.href = "/login")
-            }
+            onClick={handleLogout}
             className={`flex-1 ${sidebarFg} hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 gap-2 flex items-center justify-center`}
             title="Logout"
           >
