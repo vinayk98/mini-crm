@@ -4,6 +4,7 @@ import DashboardLayout from "../../components/DashboardLayout";
 import { getLeadById } from "../../services/leadService";
 import { useNotesStore } from "../../store/notesStore";
 import { useFollowupStore } from "../../store/followupStore";
+import { formatDateTime } from "../../utils/utils";
 
 interface Lead {
   id: number | string;
@@ -194,8 +195,10 @@ export default function LeadDetailPage() {
                       py-3 px-5 rounded-xl
                     "
                       >
-                        <p className=" text-gray-900 dark:text-gray-100 text-[12px]">
+                        <p className="text-gray-900 dark:text-gray-100 text-[12px]">
                           {lead.name}
+                          {note?.createdAt &&
+                            ` — ${formatDateTime(note.createdAt)}`}
                         </p>
                         {note.content}
                       </div>

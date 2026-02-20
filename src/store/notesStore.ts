@@ -7,15 +7,15 @@ export interface Note {
   leadId: number | string;
   content: string;
   createdBy: number;
+  createdAt?: string;
 }
-
 interface NotesState {
   notes: Note[];
   loading: boolean;
   error: string | null;
 
   fetchNotes: (leadId: number | string) => Promise<void>;
-  addNote: (data: Omit<Note, "id">) => Promise<Note | void>;
+  addNote: (data: Omit<Note, "id" | "createdAt">) => Promise<Note | void>;
   clear: () => void;
 }
 
@@ -33,7 +33,9 @@ export const useNotesStore = create<NotesState>()(
       try {
         // fetch all notes and filter client-side by leadId
         const data = await getAllNotes();
-  const filtered = (data || []).filter((n: Note) => String(n.leadId) === String(leadId));
+        const filtered = (data || []).filter(
+          (n: Note) => String(n.leadId) === String(leadId),
+        );
 
         set({
           notes: filtered,
@@ -50,9 +52,11 @@ export const useNotesStore = create<NotesState>()(
 
     addNote: async (payload) => {
       try {
-        const created = await createNote(payload);
+        const created = await createNote({
+          ...payload,
+          createdAt: new Date().toISOString(),
+        });
 
-        // safer functional update
         set((state) => ({
           notes: [...state.notes, created],
         }));
@@ -60,10 +64,7 @@ export const useNotesStore = create<NotesState>()(
         return created;
       } catch (err) {
         console.error(err);
-
-        set({
-          error: "Failed to add note",
-        });
+        set({ error: "Failed to add note" });
       }
     },
 

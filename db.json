@@ -11057,6 +11057,19 @@
       "leadId": "263",
       "content": "notes are created",
       "createdBy": 1
+    },
+    {
+      "id": "bf1c",
+      "leadId": "431",
+      "content": "this is our first meeting notes",
+      "createdBy": 1
+    },
+    {
+      "id": "b640",
+      "leadId": "431",
+      "content": "this is our third point",
+      "createdBy": 1,
+      "createdAt": "2026-02-20T11:03:26.839Z"
     }
   ],
   "followups": [
