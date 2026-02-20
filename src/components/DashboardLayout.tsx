@@ -12,6 +12,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
   const [dark, setDark] = useState(
     () => localStorage.getItem("crm_theme") === "dark",
   );
+  const role = localStorage.getItem("role");
+  const email = localStorage.getItem("email");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -33,7 +35,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
   const sidebarBg =
     crm_theme === "dark"
       ? "bg-gradient-to-b from-gray-900 to-gray-800"
-      : "bg-gradient-to-b from-indigo-600 via-purple-600 to-indigo-700";
+      : "bg-gradient-to-b from-gray-800 to-gray-700";
   const sidebarBorderColor =
     crm_theme === "dark" ? "border-gray-700" : "border-indigo-500/30";
   const sidebarFg = crm_theme === "dark" ? "text-gray-300" : "text-white/90";
@@ -153,6 +155,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
           toggleTheme={toggleTheme}
           isActive={isActive}
           handleLogout={handleLogout}
+          role={role}
+          email={email}
         />
       </aside>
 
@@ -177,6 +181,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
               toggleTheme={toggleTheme}
               isActive={isActive}
               handleLogout={handleLogout}
+              role={role}
+              email={email}
             />
           </aside>
         </div>
@@ -192,7 +198,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
           >
             {Icons.menu}
           </button>
-          <span className="font-semibold text-lg bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
+          <span className="font-semibold text-lg text-purple-600">
             LeadFlow CRM
           </span>
         </header>

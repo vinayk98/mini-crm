@@ -9,6 +9,8 @@ interface SidebarContentProps {
   handleLogout?: () => void;
   crm_theme: string;
   toggleTheme: () => void;
+  role: string | null;
+  email: string | null;
 }
 
 function SidebarContent({
@@ -22,6 +24,8 @@ function SidebarContent({
   handleLogout,
   crm_theme,
   toggleTheme,
+  role,
+  email,
 }: SidebarContentProps) {
   const Icons = {
     dashboard: (
@@ -101,7 +105,6 @@ function SidebarContent({
     ),
   };
   // theme and toggle are passed from parent
-
   const navLinks = [{ to: "/leads", icon: "users" as const, label: "Leads" }];
   return (
     <div className={`flex flex-col h-full ${sidebarBg}`}>
@@ -137,12 +140,14 @@ function SidebarContent({
         <div className="flex items-center gap-3 px-2">
           <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center shrink-0">
             <span className="text-white text-xs font-bold uppercase tracking-wide">
-              {"UN"}
+              {email ? email.charAt(0) : "U"}
             </span>
           </div>
           <div className="min-w-0 flex-1">
-            <p className="text-white text-sm font-medium truncate">{"User"}</p>
-            <p className={`${sidebarFg} text-xs capitalize`}>{"admin"}</p>
+            <p className="text-white text-sm font-medium truncate">
+              {email || ""}
+            </p>
+            <p className={`${sidebarFg} text-xs capitalize`}>{role || ""}</p>
           </div>
         </div>
 
