@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Suspense, lazy } from "react";
 import ProtectedRoute from "./features/auth/ProtectedRoute";
+import NotFoundPage from "./components/NotFoundPage";
 
 const LoginPage = lazy(() => import("./features/auth/LoginPage"));
 const LeadsPage = lazy(() => import("./features/leads/LeadsPage"));
@@ -37,6 +38,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
