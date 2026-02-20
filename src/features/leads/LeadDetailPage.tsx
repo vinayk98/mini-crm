@@ -3,15 +3,15 @@ import { useParams, useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/DashboardLayout";
 import { getNotes } from "../../services/notePage";
 import { createFollowUp, getFollowUps } from "../../services/followup";
-import { getLeads } from "../../services/leadService";
+import { getLeadById } from "../../services/leadService";
 
 interface Lead {
-  id: number;
+  id: number | string;
   name: string;
   email: string;
   phone: string;
   status: string;
-  assignedTo: number;
+  assignedTo: number | string;
 }
 
 interface Note {
@@ -35,8 +35,8 @@ export default function LeadDetailPage() {
   const [lead, setLead] = useState<Lead | null>(null);
   const [notes, setNotes] = useState<Note[]>([]);
   const [followups, setFollowups] = useState<FollowUp[]>([]);
-  // const [loading, setLoading] = useState(true);
-
+  const [noteLoading, setNoteLoading] = useState(false);
+  const [followUpLoading, setFollowUpLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<"notes" | "followups">("notes");
 
   const [noteText, setNoteText] = useState("");
@@ -48,17 +48,15 @@ export default function LeadDetailPage() {
 
     const fetchData = async () => {
       try {
-        const leadId = Number(id);
+        const leadId = id;
 
-        const [leads, notesData, followupsData] = await Promise.all([
-          getLeads(),
+        const [leadData, notesData, followupsData] = await Promise.all([
+          getLeadById(leadId),
           getNotes(leadId),
           getFollowUps(leadId),
         ]);
 
-        const selectedLead = leads.find((lead: Lead) => lead.id === leadId);
-
-        setLead(selectedLead);
+        setLead(leadData);
         setNotes(notesData);
         setFollowups(followupsData);
       } catch (error) {
@@ -72,41 +70,67 @@ export default function LeadDetailPage() {
   // Add Note
   const handleAddNote = async () => {
     if (!noteText.trim()) return;
+    const leadId = String(id);
+    setNoteLoading(true);
+    try {
+      const newNote = {
+        leadId,
+        content: noteText.trim(),
+        createdBy: 1,
+      };
 
-    const newNote = {
-      leadId: Number(id),
-      content: noteText,
-      createdBy: 1,
-    };
+      const res = await fetch("http://localhost:3001/notes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newNote),
+      });
 
-    const res = await fetch("http://localhost:3001/notes", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(newNote),
-    });
+      if (!res.ok) throw new Error("Failed to add note");
 
-    const data = await res.json();
-    setNotes([...notes, data]);
-    setNoteText("");
+      const data = await res.json();
+
+      // append optimistically
+      setNotes((prev) => [...prev, data]);
+      setNoteText("");
+
+      // refresh from server to ensure consistency
+      const notesData = await getNotes(leadId);
+      setNotes(notesData);
+    } catch (error) {
+      console.error("Error adding note:", error);
+    } finally {
+      setNoteLoading(false);
+    }
   };
 
   // Add Followup
   const handleAddFollowUp = async () => {
     if (!followUpDate) return;
+    const leadId = String(id);
+    setFollowUpLoading(true);
+    try {
+      const newFollow = {
+        leadId,
+        date: followUpDate,
+        status: "pending",
+      };
 
-    const newFollow = {
-      leadId: Number(id),
-      date: followUpDate,
-      status: "pending",
-    };
+      const created = await createFollowUp(newFollow);
 
-    const res = await createFollowUp(newFollow);
-    const data = await res.json();
-    setFollowups([...followups, data]);
-    setFollowUpDate("");
+      // optimistic append
+      setFollowups((prev) => [...prev, created]);
+      setFollowUpDate("");
+
+      // refresh from server
+      const followupsData = await getFollowUps(leadId);
+      setFollowups(followupsData);
+    } catch (error) {
+      console.error("Error adding follow-up:", error);
+    } finally {
+      setFollowUpLoading(false);
+    }
   };
 
-  // Mark Done
   const markDone = async (fid: number) => {
     await fetch(`http://localhost:3001/followups/${fid}`, {
       method: "PATCH",
@@ -177,9 +201,10 @@ export default function LeadDetailPage() {
                   />
                   <button
                     onClick={handleAddNote}
-                    className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
+                    disabled={noteLoading}
+                    className={`mt-2 bg-blue-600 text-white px-4 py-2 rounded ${noteLoading ? "opacity-60 cursor-not-allowed" : ""}`}
                   >
-                    Add Note
+                    {noteLoading ? "Adding…" : "Add Note"}
                   </button>
 
                   <div className="mt-4 space-y-2">
@@ -198,14 +223,16 @@ export default function LeadDetailPage() {
                   <input
                     type="date"
                     value={followUpDate}
+                    min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setFollowUpDate(e.target.value)}
                     className="border p-2 rounded w-full"
                   />
                   <button
                     onClick={handleAddFollowUp}
-                    className="mt-2 bg-blue-600 text-white px-4 py-2 rounded"
+                    disabled={followUpLoading}
+                    className={`mt-2 bg-blue-600 text-white px-4 py-2 rounded ${followUpLoading ? "opacity-60 cursor-not-allowed" : ""}`}
                   >
-                    Schedule
+                    {followUpLoading ? "Scheduling…" : "Schedule"}
                   </button>
 
                   <div className="mt-4 space-y-2">

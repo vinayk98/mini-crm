@@ -21,13 +21,15 @@ export const getLeads = async (params?: {
   return res.data;
 };
 
-export const getLeadById = async (id: number): Promise<Lead> => {
+export const getLeadById = async (id: number | string): Promise<Lead> => {
   const res = await api.get(`/leads/${id}`);
   console.log(res, "123123");
   return res.data;
 };
 
-export const createLead = async (data: Lead): Promise<Lead> => {
+export const createLead = async (
+  data: Omit<Lead, "id">,
+): Promise<Lead> => {
   const res = await api.post("/leads", data);
   return res.data;
 };

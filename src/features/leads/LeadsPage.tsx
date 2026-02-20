@@ -3,19 +3,23 @@ import { useNavigate } from "react-router-dom";
 import { StatusBadge } from "../../components/StatusBadge";
 import DashboardLayout from "../../components/DashboardLayout";
 import type { Lead } from "../../types/lead";
+import { createLead, updateLead } from "../../services/leadService";
 import { BsEyeFill, BsPencilSquare, BsTrash3Fill } from "react-icons/bs";
+import LeadModal from "../../components/LeadFormData";
+import type { LeadFormData } from "../../types/leadFormData";
 
 const PAGE_SIZE = 10;
 export default function LeadsListPage() {
   const navigate = useNavigate();
   const [leads, setLeads] = useState<Lead[]>([]);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
   const [loading, setLoading] = useState(true);
 
-  // ✅ Fetch Leads from API
   useEffect(() => {
     fetch("http://localhost:3001/leads")
       .then((res) => res.json())
@@ -50,13 +54,45 @@ export default function LeadsListPage() {
     return result;
   }, [leads, search, statusFilter, sortDir]);
 
+  const handleSaveLead = async (formData: LeadFormData) => {
+    try {
+      if (selectedLead) {
+        // update existing lead
+        const payload: Partial<Lead> = {
+          ...selectedLead,
+          ...formData,
+          assignedTo:
+            Number(formData.assignedTo) || selectedLead.assignedTo || 1,
+        };
+
+        const updated = await updateLead(Number(selectedLead.id), payload);
+        setLeads((prev) =>
+          prev.map((l) => (l.id === updated.id ? updated : l)),
+        );
+      } else {
+        // CREATE
+        const payload: Omit<Lead, "id"> = {
+          ...formData,
+          createdAt: new Date().toISOString(),
+          assignedTo: Number(formData.assignedTo) || 1,
+        } as Omit<Lead, "id">;
+
+        const created = await createLead(payload);
+        setLeads((prev) => [created, ...prev]);
+      }
+    } catch (err) {
+      console.error("Failed to save lead", err);
+    } finally {
+      setModalOpen(false);
+      setSelectedLead(null);
+    }
+  };
+
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
-  if (loading) {
-    return <div className="p-6">Loading leads...</div>;
-  }
-  console.log(leads);
+  if (loading) return <div className="p-6">Loading leads...</div>;
+
   return (
     <div>
       <DashboardLayout
@@ -69,7 +105,10 @@ export default function LeadsListPage() {
                 </h1>
 
                 <button
-                  onClick={() => navigate("/leads/new")}
+                  onClick={() => {
+                    setSelectedLead(null);
+                    setModalOpen(true);
+                  }}
                   className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
                 >
                   + New Lead
@@ -139,7 +178,7 @@ export default function LeadsListPage() {
                     {paginated.map((lead) => (
                       <tr
                         key={lead.id}
-                        className="border-b hover:bg-gray-lighter dark:hover:hover:bg-gray-100 transition"
+                        className="border-b hover:bg-gray-lighter dark:hover:bg-gray-700 transition"
                       >
                         <td className="px-4 py-3 font-medium">
                           <div className="flex flex-col text-white dark:text-gray-600">
@@ -169,7 +208,10 @@ export default function LeadsListPage() {
                               <BsEyeFill size={18} />
                             </button>
                             <button
-                              onClick={() => navigate(`/leads/edit/${lead.id}`)}
+                              onClick={() => {
+                                setSelectedLead(lead);
+                                setModalOpen(true);
+                              }}
                               className="text-green-600 hover:text-green-800 transition"
                               title="Edit"
                             >
@@ -179,9 +221,7 @@ export default function LeadsListPage() {
                               onClick={async () => {
                                 await fetch(
                                   `http://localhost:3001/leads/${lead.id}`,
-                                  {
-                                    method: "DELETE",
-                                  },
+                                  { method: "DELETE" },
                                 );
                                 setLeads((prev) =>
                                   prev.filter((l) => l.id !== lead.id),
@@ -226,7 +266,10 @@ export default function LeadsListPage() {
                         View
                       </button>
                       <button
-                        onClick={() => navigate(`/leads/edit/${lead.id}`)}
+                        onClick={() => {
+                          setSelectedLead(lead);
+                          setModalOpen(true);
+                        }}
                         className="text-green-600"
                       >
                         Edit
@@ -235,9 +278,7 @@ export default function LeadsListPage() {
                         onClick={async () => {
                           await fetch(
                             `http://localhost:3001/leads/${lead.id}`,
-                            {
-                              method: "DELETE",
-                            },
+                            { method: "DELETE" },
                           );
                           setLeads((prev) =>
                             prev.filter((l) => l.id !== lead.id),
@@ -281,6 +322,27 @@ export default function LeadsListPage() {
               )}
             </div>
           </>
+        }
+      />
+      <LeadModal
+        isOpen={modalOpen}
+        onClose={() => {
+          setModalOpen(false);
+          setSelectedLead(null);
+        }}
+        onSubmit={handleSaveLead}
+        initialData={
+          selectedLead
+            ? {
+                name: selectedLead.name,
+                phone: selectedLead.phone,
+                email: selectedLead.email,
+                company: selectedLead.company,
+                status: selectedLead.status,
+                source: selectedLead.source,
+                assignedTo: String(selectedLead.assignedTo ?? ""),
+              }
+            : undefined
         }
       />
     </div>

@@ -51,7 +51,7 @@ const lastNames = [
 ];
 
 interface Lead {
-  id: number;
+  id: number | string;
   name: string;
   email: string;
   phone: string;
@@ -73,7 +73,7 @@ for (let i = 1; i <= 1000; i++) {
   createdDate.setDate(createdDate.getDate() - Math.floor(Math.random() * 180));
 
   leads.push({
-    id: i,
+    id: String(i),
     name: `${first} ${last}`,
     email: `lead${i}@gmail.com`,
     phone: `9${Math.floor(100000000 + Math.random() * 900000000)}`,
