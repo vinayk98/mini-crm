@@ -23,7 +23,6 @@ export const getLeads = async (params?: {
 
 export const getLeadById = async (id: number | string): Promise<Lead> => {
   const res = await api.get(`/leads/${id}`);
-  console.log(res, "123123");
   return res.data;
 };
 
