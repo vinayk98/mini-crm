@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import type { LeadFormData } from "../types/leadFormData";
+import CustomSelect from "./CustomSelect";
 interface Props {
   isOpen: boolean;
   onClose: () => void;
@@ -89,121 +90,150 @@ const LeadModal: React.FC<Props> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-8 relative">
+      <div className="w-full max-w-xl bg-white dark:bg-gray-800 rounded-2xl shadow-xl px-8 py-6 relative max-h-[85vh] animate-slideUp transition-colors">
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-semibold">
+          <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
             {isEditMode ? "Update Lead" : "New Lead"}
           </h2>
           <button
             onClick={onClose}
-            className="text-gray-500 hover:text-gray-800 text-xl"
+            className="text-gray-500 dark:text-gray-400 hover:text-gray-800 dark:hover:text-white text-xl transition"
           >
             ✕
           </button>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Name */}
           <div>
-            <label className="block text-sm font-medium mb-1">Name *</label>
+            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+              Name *
+            </label>
             <input
               type="text"
               name="name"
               value={form.name}
               onChange={handleChange}
-              required
               placeholder="Full name"
-              className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.name ? "border-red-500" : ""}`}
+              className={`w-full rounded-xl px-4 py-3 border
+              bg-white text-gray-800 border-gray-300
+              dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700
+              focus:outline-none focus:ring-2 focus:ring-indigo-500
+              ${errors.name ? "border-red-500 dark:border-red-400" : ""}
+            `}
             />
             {errors.name && (
               <p className="text-red-500 text-sm mt-1">{errors.name}</p>
             )}
           </div>
 
+          {/* Company */}
           <div>
-            <label className="block text-sm font-medium mb-1">
-              Phone * (10 digits)
+            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+              Company
             </label>
-            <input
-              type="text"
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              required
-              maxLength={10}
-              placeholder="9876543210"
-              className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.phone ? "border-red-500" : ""}`}
-            />
-            {errors.phone && (
-              <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="optional@email.com"
-              className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.email ? "border-red-500" : ""}`}
-            />
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">{errors.email}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-1">Company</label>
             <input
               type="text"
               name="company"
               value={form.company}
               onChange={handleChange}
               placeholder="Company name"
-              className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.company ? "border-red-500" : ""}`}
+              className="w-full rounded-xl px-4 py-3 border
+              bg-white text-gray-800 border-gray-300
+              dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700
+              focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
-            {errors.company && (
-              <p className="text-red-500 text-sm mt-1">{errors.company}</p>
-            )}
           </div>
 
+          {/* Phone + Email */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Status *</label>
-              <select
-                name="status"
-                value={form.status}
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                Phone *
+              </label>
+              <input
+                type="text"
+                name="phone"
+                value={form.phone}
                 onChange={handleChange}
-                required
-                className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.status ? "border-red-500" : ""}`}
-              >
-                <option value="New">New</option>
-                <option value="Contacted">Contacted</option>
-                <option value="Qualified">Qualified</option>
-                <option value="Lost">Lost</option>
-              </select>
+                maxLength={10}
+                placeholder="9876543210"
+                className={`w-full rounded-xl px-4 py-3 border
+                bg-white text-gray-800 border-gray-300
+                dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700
+                focus:outline-none focus:ring-2 focus:ring-indigo-500
+                ${errors.phone ? "border-red-500 dark:border-red-400" : ""}
+              `}
+              />
+              {errors.phone && (
+                <p className="text-red-500 text-sm mt-1">{errors.phone}</p>
+              )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1">Source *</label>
-              <select
-                name="source"
-                value={form.source}
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={form.email}
                 onChange={handleChange}
-                required
-                className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.source ? "border-red-500" : ""}`}
-              >
-                <option value="Website">Website</option>
-                <option value="Referral">Referral</option>
-                <option value="Social Media">Social Media</option>
-                <option value="Cold Call">Cold Call</option>
-              </select>
+                placeholder="optional@email.com"
+                className={`w-full rounded-xl px-4 py-3 border
+                bg-white text-gray-800 border-gray-300
+                dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700
+                focus:outline-none focus:ring-2 focus:ring-indigo-500
+                ${errors.email ? "border-red-500 dark:border-red-400" : ""}
+              `}
+              />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
           </div>
 
+          {/* Status + Source */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                Status *
+              </label>
+              <CustomSelect
+                value={form.status}
+                options={[
+                  { label: "New", value: "New" },
+                  { label: "Contacted", value: "Contacted" },
+                  { label: "Qualified", value: "Qualified" },
+                  { label: "Lost", value: "Lost" },
+                ]}
+                onChange={(val) => setForm({ ...form, status: val })}
+                error={errors.status}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
+                Source *
+              </label>
+              <CustomSelect
+                value={form.source}
+                options={[
+                  { label: "Website", value: "Website" },
+                  { label: "Referral", value: "Referral" },
+                  { label: "Social Media", value: "Social Media" },
+                  { label: "Cold Call", value: "Cold Call" },
+                ]}
+                onChange={(val) => setForm({ ...form, source: val })}
+                error={errors.source}
+              />
+            </div>
+          </div>
+
+          {/* Assigned To */}
           <div>
-            <label className="block text-sm font-medium mb-1">
+            <label className="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
               Assigned To *
             </label>
             <input
@@ -211,19 +241,28 @@ const LeadModal: React.FC<Props> = ({
               name="assignedTo"
               value={form.assignedTo}
               onChange={handleChange}
-              required
-              className={`w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-indigo-500 ${errors.assignedTo ? "border-red-500" : ""}`}
+              className={`w-full rounded-xl px-4 py-3 border
+              bg-white text-gray-800 border-gray-300
+              dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700
+              focus:outline-none focus:ring-2 focus:ring-indigo-500
+              ${errors.assignedTo ? "border-red-500 dark:border-red-400" : ""}
+            `}
             />
             {errors.assignedTo && (
               <p className="text-red-500 text-sm mt-1">{errors.assignedTo}</p>
             )}
           </div>
 
+          {/* Buttons */}
           <div className="flex justify-end gap-4 pt-4">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-2 rounded-xl border text-gray-700 hover:bg-gray-100"
+              className="px-6 py-2 rounded-xl border
+              border-gray-300 text-gray-700
+              hover:bg-gray-100
+              dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700
+              transition"
             >
               Cancel
             </button>

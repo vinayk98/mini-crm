@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
 import { login } from "../../services/authService";
+import { generateFakeToken } from "../../utils/utils";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -10,11 +11,11 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
+  const token = localStorage.getItem("token");
   const storedUser = localStorage.getItem("user");
   const storedRole = localStorage.getItem("role");
-  if (storedUser && storedRole) return <Navigate to="/leads" replace />;
-
+  if (storedUser && storedRole && token)
+    return <Navigate to="/leads" replace />;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -30,14 +31,18 @@ export default function LoginPage() {
     }
 
     setLoading(true);
+
     try {
       const user = await login(email.trim(), password);
       if (user) {
+        const token = generateFakeToken();
         // store minimal user info
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("role", user.role);
         localStorage.setItem("email", user.email);
-        navigate("/leads");
+        if (token) {
+          navigate("/leads");
+        }
       } else {
         setError("Invalid email or password.");
       }

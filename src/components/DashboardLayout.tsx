@@ -198,7 +198,7 @@ export default function DashboardLayout({ children }: LayoutProps) {
           >
             {Icons.menu}
           </button>
-          <span className="font-semibold text-lg text-purple-600">
+          <span className="font-semibold text-lg text-gray-700 dark:text-gray-300">
             LeadFlow CRM
           </span>
         </header>
