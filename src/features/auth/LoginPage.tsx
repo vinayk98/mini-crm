@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Navigate } from "react-router-dom";
+import { login } from "../../services/authService";
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -10,9 +11,9 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const user = localStorage.getItem("user");
-
-  if (user) return <Navigate to="/leads" replace />;
+  const storedUser = localStorage.getItem("user");
+  const storedRole = localStorage.getItem("role");
+  if (storedUser && storedRole) return <Navigate to="/leads" replace />;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,32 +30,23 @@ export default function LoginPage() {
     }
 
     setLoading(true);
-
-    await new Promise((r) => setTimeout(r, 600));
-    if (
-      (email === "admin@gmail.com" && password === "Admin@123") ||
-      (email === "sales@gmail.com" && password === "Sales@123") ||
-      (email === "manager@gmail.com" && password === "Manager@123")
-    ) {
-      let role = "";
-
-      if (email === "admin@gmail.com") {
-        role = "admin";
-      } else if (email === "sales@gmail.com") {
-        role = "sales";
-      } else if (email === "manager@gmail.com") {
-        role = "manager";
+    try {
+      const user = await login(email.trim(), password);
+      if (user) {
+        // store minimal user info
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("role", user.role);
+        localStorage.setItem("email", user.email);
+        navigate("/leads");
+      } else {
+        setError("Invalid email or password.");
       }
-
-      localStorage.setItem("role", role);
-      localStorage.setItem("email", email);
-
-      navigate("/leads");
-    } else {
-      setError("Invalid email or password.");
+    } catch (err) {
+      console.error(err);
+      setError("Login failed. Please try again.");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
