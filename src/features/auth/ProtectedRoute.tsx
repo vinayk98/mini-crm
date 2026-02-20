@@ -2,12 +2,13 @@ import { Navigate } from "react-router-dom";
 
 interface Props {
   children: React.ReactNode;
+  allowedRoles: string[];
 }
 
-const ProtectedRoute = ({ children }: Props) => {
-  const isLoggedIn = localStorage.getItem("isLoggedIn");
+const ProtectedRoute = ({ children, allowedRoles }: Props) => {
+  const userRole = localStorage.getItem("role");
 
-  if (!isLoggedIn) {
+  if (!allowedRoles.includes(userRole || "")) {
     return <Navigate to="/" replace />;
   }
 
