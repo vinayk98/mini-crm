@@ -1,19 +1,19 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "email": "admin@gmail.com",
       "password": "Admin@123",
       "role": "admin"
     },
     {
-      "id": 2,
+      "id": "2",
       "email": "sales@gmail.com",
       "password": "Sales@123",
       "role": "sales"
     },
     {
-      "id": 3,
+      "id": "3",
       "email": "manager@gmail.com",
       "password": "Manager@123",
       "role": "manager"
@@ -2903,17 +2903,6 @@
       "createdAt": "2025-10-09T11:57:46.343Z"
     },
     {
-      "id": "263",
-      "name": "Harsh Gupta",
-      "email": "lead263@gmail.com",
-      "phone": "9748499149",
-      "status": "contacted",
-      "source": "referral",
-      "company": "TechNova Pvt Ltd",
-      "assignedTo": 3,
-      "createdAt": "2026-02-20T11:57:46.343Z"
-    },
-    {
       "id": "264",
       "name": "Rohit Malhotra",
       "email": "lead264@gmail.com",
@@ -4204,7 +4193,7 @@
       "id": "381",
       "name": "Manish Kumar",
       "email": "lead381@gmail.com",
-      "phone": "9564647025",
+      "phone": "9564647022",
       "status": "new",
       "source": "referral",
       "company": "Skyline Solutions",
@@ -11019,6 +11008,17 @@
       "company": "Vertex Enterprises",
       "assignedTo": 2,
       "createdAt": "2026-02-18T11:57:46.343Z"
+    },
+    {
+      "id": "87e7",
+      "name": "developer",
+      "phone": "9887667887",
+      "email": "zampa1@gmail.com",
+      "company": "Wayne Enterprises",
+      "status": "New",
+      "source": "Referral",
+      "assignedTo": 1,
+      "createdAt": "2026-02-20T16:12:21.270Z"
     }
   ],
   "notes": [],

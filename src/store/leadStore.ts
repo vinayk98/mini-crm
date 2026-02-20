@@ -1,17 +1,15 @@
 import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
+import {
+  getLeadById,
+  getLeads,
+  createLead as svcCreateLead,
+  updateLead as svcUpdateLead,
+  deleteLead as svcDeleteLead,
+} from "../services/leadService";
+import type { Lead as ApiLead } from "../types/lead";
 
-export interface Lead {
-  id: number | string;
-  name: string;
-  email?: string;
-  phone: string;
-  source: string;
-  status: string;
-  company?: string;
-  createdAt: string;
-  assignedTo?: number | string;
-}
+export type Lead = ApiLead;
 
 interface LeadState {
   leads: Lead[];
@@ -30,7 +28,7 @@ interface LeadState {
 export const useLeadStore = create<LeadState>()(
   devtools(
     persist(
-      (set) => ({
+      (set, get) => ({
         leads: [],
         selectedLead: null,
         loading: false,
@@ -39,8 +37,7 @@ export const useLeadStore = create<LeadState>()(
         fetchLeads: async () => {
           set({ loading: true });
           try {
-            const res = await fetch("http://localhost:3001/leads");
-            const data = await res.json();
+            const data = await getLeads();
             set({ leads: data, loading: false });
           } catch (err) {
             console.log(err);
@@ -51,64 +48,41 @@ export const useLeadStore = create<LeadState>()(
         fetchLeadById: async (id) => {
           set({ loading: true });
           try {
-            const res = await fetch(`http://localhost:3001/leads/${id}`);
-            const data = await res.json();
+            const data = await getLeadById(id);
             set({ selectedLead: data, loading: false });
-          } catch {
+          } catch (err) {
+            console.error(err);
             set({ error: "Failed to fetch lead", loading: false });
           }
         },
 
         addLead: async (lead) => {
           try {
-            const res = await fetch("http://localhost:3001/leads", {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(lead),
-            });
-
-            const data = await res.json();
-            set((state) => ({
-              leads: [...state.leads, data],
-            }));
-          } catch {
+            await svcCreateLead(lead);
+            await get().fetchLeads();
+          } catch (err) {
+            console.error(err);
             set({ error: "Failed to add lead" });
           }
         },
 
         updateLead: async (id, updated) => {
           try {
-            const res = await fetch(`http://localhost:3001/leads/${id}`, {
-              method: "PATCH",
-              headers: {
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify(updated),
-            });
-
-            const data = await res.json();
-
-            set((state) => ({
-              leads: state.leads.map((l) => (l.id === id ? data : l)),
-              selectedLead: data,
-            }));
-          } catch {
+            await svcUpdateLead(Number(id), updated as Partial<ApiLead>);
+            await get().fetchLeads();
+            await get().fetchLeadById(id);
+          } catch (err) {
+            console.error(err);
             set({ error: "Failed to update lead" });
           }
         },
 
         deleteLead: async (id) => {
           try {
-            await fetch(`http://localhost:3001/leads/${id}`, {
-              method: "DELETE",
-            });
-
-            set((state) => ({
-              leads: state.leads.filter((l) => l.id !== id),
-            }));
-          } catch {
+            await svcDeleteLead(Number(id));
+            await get().fetchLeads();
+          } catch (err) {
+            console.error(err);
             set({ error: "Failed to delete lead" });
           }
         },
@@ -116,7 +90,7 @@ export const useLeadStore = create<LeadState>()(
         clearSelected: () => set({ selectedLead: null }),
       }),
       {
-        name: "lead-storage", // localStorage key
+        name: "lead-storage",
       },
     ),
   ),

@@ -7,6 +7,7 @@
     "dev": "vite",
     "generate": "ts-node generateData.ts",
     "server": "json-server --watch db.json --port 3001",
+    "start": "json-server --watch db.json --host 0.0.0.0 --port $PORT",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
