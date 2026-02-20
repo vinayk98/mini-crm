@@ -26,9 +26,7 @@ export const getLeadById = async (id: number | string): Promise<Lead> => {
   return res.data;
 };
 
-export const createLead = async (
-  data: Omit<Lead, "id">,
-): Promise<Lead> => {
+export const createLead = async (data: Omit<Lead, "id">): Promise<Lead> => {
   const res = await api.post("/leads", data);
   return res.data;
 };
