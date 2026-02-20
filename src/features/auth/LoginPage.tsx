@@ -37,6 +37,7 @@ export default function LoginPage() {
       if (user) {
         const token = generateFakeToken();
         // store minimal user info
+        localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("role", user.role);
         localStorage.setItem("email", user.email);

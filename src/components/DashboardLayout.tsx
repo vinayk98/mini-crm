@@ -29,6 +29,8 @@ export default function DashboardLayout({ children }: LayoutProps) {
     localStorage.removeItem("email");
     localStorage.removeItem("role");
     localStorage.removeItem("crm_theme");
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
   };
   const isActive = (to: string) =>
     location.pathname === to || location.pathname.startsWith(to + "/");
