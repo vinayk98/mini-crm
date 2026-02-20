@@ -12,12 +12,14 @@ const PAGE_SIZE = 10;
 export default function LeadsListPage() {
   const navigate = useNavigate();
   const leads = useLeadStore((s) => s.leads);
+  const role = localStorage.getItem("role");
   const fetchLeads = useLeadStore((s) => s.fetchLeads);
   const addLead = useLeadStore((s) => s.addLead);
   const updateLead = useLeadStore((s) => s.updateLead);
   const deleteLead = useLeadStore((s) => s.deleteLead);
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedLead, setSelectedLead] = useState<StoreLead | null>(null);
+  const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
@@ -29,7 +31,12 @@ export default function LeadsListPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // ✅ Filtering + Sorting
+  // debounce query -> search (300ms)
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(query), 300);
+    return () => clearTimeout(t);
+  }, [query]);
+
   const filtered = useMemo(() => {
     let result = [...leads];
 
@@ -111,9 +118,9 @@ export default function LeadsListPage() {
                 <input
                   type="text"
                   placeholder="Search name or phone..."
-                  value={search}
+                  value={query}
                   onChange={(e) => {
-                    setSearch(e.target.value);
+                    setQuery(e.target.value);
                     setPage(1);
                   }}
                   className="border px-3 py-2 rounded-lg w-full sm:w-64"
@@ -200,25 +207,29 @@ export default function LeadsListPage() {
                             >
                               <BsEyeFill size={18} />
                             </button>
-                            <button
-                              onClick={() => {
-                                setSelectedLead(lead);
-                                setModalOpen(true);
-                              }}
-                              className="text-green-600 hover:text-green-800 transition"
-                              title="Edit"
-                            >
-                              <BsPencilSquare size={18} />
-                            </button>
-                            <button
-                              onClick={async () => {
-                                await deleteLead(Number(lead.id));
-                              }}
-                              className="text-red-600 hover:text-red-800 transition"
-                              title="Delete"
-                            >
-                              <BsTrash3Fill size={18} />
-                            </button>
+                            {role === "admin" ? (
+                              <>
+                                <button
+                                  onClick={() => {
+                                    setSelectedLead(lead);
+                                    setModalOpen(true);
+                                  }}
+                                  className="text-green-600 hover:text-green-800 transition"
+                                  title="Edit"
+                                >
+                                  <BsPencilSquare size={18} />
+                                </button>
+                                <button
+                                  onClick={async () => {
+                                    await deleteLead(Number(lead.id));
+                                  }}
+                                  className="text-red-600 hover:text-red-800 transition"
+                                  title="Delete"
+                                >
+                                  <BsTrash3Fill size={18} />
+                                </button>
+                              </>
+                            ) : null}
                           </div>
                         </td>
                       </tr>
