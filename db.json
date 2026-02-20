@@ -1,19 +1,19 @@
 {
   "users": [
     {
-      "id": 1,
+      "id": "1",
       "email": "admin@gmail.com",
       "password": "Admin@123",
       "role": "admin"
     },
     {
-      "id": 2,
+      "id": "2",
       "email": "sales@gmail.com",
       "password": "Sales@123",
       "role": "sales"
     },
     {
-      "id": 3,
+      "id": "3",
       "email": "manager@gmail.com",
       "password": "Manager@123",
       "role": "manager"
@@ -5108,7 +5108,7 @@
       "email": "lead463@gmail.com",
       "phone": "9607864066",
       "status": "lost",
-      "source": "cold call",
+      "source": "Referral",
       "company": "TechNova Pvt Ltd",
       "assignedTo": 2,
       "createdAt": "2026-02-20T04:43:56.101Z"
@@ -11021,6 +11021,20 @@
       "createdAt": "2025-11-29T04:43:56.101Z"
     }
   ],
-  "notes": [],
-  "followups": []
+  "notes": [
+    {
+      "id": "b49d",
+      "leadId": "463",
+      "content": "this is our first meeting note",
+      "createdBy": 1
+    }
+  ],
+  "followups": [
+    {
+      "id": "84b4",
+      "leadId": "463",
+      "date": "2026-02-21",
+      "status": "pending"
+    }
+  ]
 }

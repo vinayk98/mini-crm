@@ -2,13 +2,15 @@ import { create } from "zustand";
 import { devtools, persist } from "zustand/middleware";
 
 export interface Lead {
-  id: number;
+  id: number | string;
   name: string;
+  email?: string;
   phone: string;
   source: string;
   status: string;
+  company?: string;
   createdAt: string;
-  assignedTo?: string;
+  assignedTo?: number | string;
 }
 
 interface LeadState {
@@ -18,10 +20,10 @@ interface LeadState {
   error: string | null;
 
   fetchLeads: () => Promise<void>;
-  fetchLeadById: (id: number) => Promise<void>;
+  fetchLeadById: (id: number | string) => Promise<void>;
   addLead: (lead: Omit<Lead, "id">) => Promise<void>;
-  updateLead: (id: number, updated: Partial<Lead>) => Promise<void>;
-  deleteLead: (id: number) => Promise<void>;
+  updateLead: (id: number | string, updated: Partial<Lead>) => Promise<void>;
+  deleteLead: (id: number | string) => Promise<void>;
   clearSelected: () => void;
 }
 
