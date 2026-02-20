@@ -4,6 +4,7 @@ import DashboardLayout from "../../components/DashboardLayout";
 import { getLeadById } from "../../services/leadService";
 import { useNotesStore } from "../../store/notesStore";
 import { useFollowupStore } from "../../store/followupStore";
+import { formatDateTime } from "../../utils/utils";
 
 interface Lead {
   id: number | string;
@@ -97,68 +98,108 @@ export default function LeadDetailPage() {
   if (!lead) return <div className="p-8">Lead not found</div>;
 
   return (
-    <div>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
       <DashboardLayout
         children={
           <>
             <div className="p-6 max-w-4xl mx-auto">
               <button
                 onClick={() => navigate(-1)}
-                className="mb-4 text-blue-600"
+                className="mb-4 text-blue-600 dark:text-blue-400"
               >
                 ← Back
               </button>
 
               <h1 className="text-2xl font-bold mb-2">{lead.name}</h1>
 
+              {/* Lead Info */}
               <div className="grid grid-cols-2 gap-4 mb-6">
-                <div className="border p-3 rounded">
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p>{lead.email}</p>
+                <div className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-3 px-5 rounded-xl">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Email
+                  </p>
+                  <p className="text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">
+                    {lead.email}
+                  </p>
                 </div>
-                <div className="border p-3 rounded">
-                  <p className="text-sm text-gray-500">Phone</p>
-                  <p>{lead.phone}</p>
+
+                <div className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-3 px-5 rounded-xl">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
+                    Phone
+                  </p>
+                  <p className="text-gray-900 dark:text-gray-100">
+                    {lead.phone}
+                  </p>
                 </div>
               </div>
-              <div className="flex gap-4 mb-4 border-b pb-2">
+
+              {/* Tabs */}
+              <div className="flex gap-6 mb-4 border-gray-200 dark:border-gray-700 pb-2">
                 <button
                   onClick={() => setActiveTab("notes")}
-                  className={
-                    activeTab === "notes" ? "font-bold text-blue-600" : ""
-                  }
+                  className={`font-medium ${
+                    activeTab === "notes"
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-gray-600 dark:text-gray-400"
+                  }`}
                 >
                   Notes
                 </button>
+
                 <button
                   onClick={() => setActiveTab("followups")}
-                  className={
-                    activeTab === "followups" ? "font-bold text-blue-600" : ""
-                  }
+                  className={`font-medium ${
+                    activeTab === "followups"
+                      ? "text-blue-600 dark:text-blue-400"
+                      : "text-gray-600 dark:text-gray-400"
+                  }`}
                 >
                   Followups
                 </button>
               </div>
 
+              {/* Notes Tab */}
               {activeTab === "notes" && (
                 <div>
                   <textarea
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
-                    className="w-full border p-2 rounded"
                     placeholder="Add note"
+                    className="
+                  w-full border-2 rounded-xl py-3 px-5
+                  bg-white dark:bg-gray-800
+                  text-gray-900 dark:text-gray-100
+                  border-gray-200 dark:border-gray-700
+                  focus:outline-none
+                  focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+                "
                   />
+
                   <button
                     onClick={handleAddNote}
                     disabled={noteLoading}
-                    className={`mt-2 bg-blue-600 text-white px-4 py-2 rounded ${noteLoading ? "opacity-60 cursor-not-allowed" : ""}`}
+                    className={`mt-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-xl transition ${
+                      noteLoading ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
                   >
                     {noteLoading ? "Adding…" : "Add Note"}
                   </button>
 
-                  <div className="mt-4 space-y-2">
+                  <div className="mt-4 space-y-3">
                     {notes.map((note) => (
-                      <div key={note.id} className="border p-3 rounded">
+                      <div
+                        key={note.id}
+                        className="
+                      border-2 border-gray-200 dark:border-gray-700
+                      bg-white dark:bg-gray-800
+                      py-3 px-5 rounded-xl
+                    "
+                      >
+                        <p className="text-gray-900 dark:text-gray-100 text-[12px]">
+                          {lead.name}
+                          {note?.createdAt &&
+                            ` — ${formatDateTime(note.createdAt)}`}
+                        </p>
                         {note.content}
                       </div>
                     ))}
@@ -166,7 +207,7 @@ export default function LeadDetailPage() {
                 </div>
               )}
 
-              {/* Followups */}
+              {/* Followups Tab */}
               {activeTab === "followups" && (
                 <div>
                   <input
@@ -174,29 +215,44 @@ export default function LeadDetailPage() {
                     value={followUpDate}
                     min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setFollowUpDate(e.target.value)}
-                    className="border p-2 rounded w-full"
+                    className="
+                  w-full border-2 rounded-xl py-3 px-5
+                  bg-white dark:bg-gray-800
+                  text-gray-900 dark:text-gray-100
+                  border-gray-200 dark:border-gray-700
+                  focus:outline-none
+                  focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
+                "
                   />
+
                   <button
                     onClick={handleAddFollowUp}
                     disabled={followUpLoading}
-                    className={`mt-2 bg-blue-600 text-white px-4 py-2 rounded ${followUpLoading ? "opacity-60 cursor-not-allowed" : ""}`}
+                    className={`mt-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white px-4 py-2 rounded-xl transition ${
+                      followUpLoading ? "opacity-60 cursor-not-allowed" : ""
+                    }`}
                   >
                     {followUpLoading ? "Scheduling…" : "Schedule"}
                   </button>
 
-                  <div className="mt-4 space-y-2">
+                  <div className="mt-4 space-y-3">
                     {followups.map((f) => (
                       <div
                         key={f.id}
-                        className="border p-3 rounded flex justify-between"
+                        className="
+                      border-[2px] border-gray-200 dark:border-gray-700
+                      bg-white dark:bg-gray-800 px-5
+                      py-3 rounded-xl flex justify-between items-center
+                    "
                       >
                         <div>
                           {f.date} — {f.status}
                         </div>
+
                         {f.status !== "completed" && (
                           <button
                             onClick={() => handleMarkDone(f.id)}
-                            className="text-green-600"
+                            className="text-green-600 dark:text-green-400"
                           >
                             Mark Done
                           </button>

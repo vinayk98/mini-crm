@@ -8,6 +8,7 @@ export interface FollowUp {
   leadId: number | string;
   date: string;
   status: string;
+  createdAt?: string;
 }
 
 interface FollowupState {
@@ -15,7 +16,7 @@ interface FollowupState {
   loading: boolean;
   error: string | null;
   fetchFollowUps: (leadId: number | string) => Promise<void>;
-  addFollowUp: (data: Omit<FollowUp, "id">) => Promise<FollowUp | void>;
+  addFollowUp: (data: Omit<FollowUp, "id" | "createdAt">) => Promise<FollowUp | void>;
   markDone: (id: number | string, leadId: number | string) => Promise<void>;
   clear: () => void;
 }
@@ -30,7 +31,9 @@ export const useFollowupStore = create<FollowupState>()(
       set({ loading: true });
       try {
         const data = await getAllFollowUps();
-        const filtered = (data || []).filter((f: FollowUp) => String(f.leadId) === String(leadId));
+        const filtered = (data || []).filter(
+          (f: FollowUp) => String(f.leadId) === String(leadId),
+        );
         set({ followups: filtered, loading: false });
       } catch (err) {
         console.error(err);

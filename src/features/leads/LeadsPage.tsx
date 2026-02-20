@@ -7,6 +7,7 @@ import { useLeadStore } from "../../store/leadStore";
 import { BsEyeFill, BsPencilSquare, BsTrash3Fill } from "react-icons/bs";
 import LeadModal from "../../components/LeadFormData";
 import type { LeadFormData } from "../../types/leadFormData";
+import CustomSelect from "../../components/CustomSelect";
 
 const PAGE_SIZE = 10;
 export default function LeadsListPage() {
@@ -104,15 +105,17 @@ export default function LeadsListPage() {
                   Leads
                 </h1>
 
-                <button
-                  onClick={() => {
-                    setSelectedLead(null);
-                    setModalOpen(true);
-                  }}
-                  className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-                >
-                  + New Lead
-                </button>
+                {role === "admin" ? (
+                  <button
+                    onClick={() => {
+                      setSelectedLead(null);
+                      setModalOpen(true);
+                    }}
+                    className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+                  >
+                    + New Lead
+                  </button>
+                ) : null}
               </div>
               <div className="flex flex-col sm:flex-row gap-3 mb-5">
                 <input
@@ -123,27 +126,31 @@ export default function LeadsListPage() {
                     setQuery(e.target.value);
                     setPage(1);
                   }}
-                  className="border px-3 py-2 rounded-lg w-full sm:w-64"
+                  className="rounded-xl px-4 h-[52px] flex items-center justify-between cursor-pointer
+        border bg-white text-gray-800
+        dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700"
                 />
-
-                <select
+                <CustomSelect
                   value={statusFilter}
-                  onChange={(e) => {
-                    setStatusFilter(e.target.value);
+                  className="w-full sm:w-48"
+                  options={[
+                    { label: "All Statuses", value: "All" },
+                    { label: "New", value: "New" },
+                    { label: "Contacted", value: "Contacted" },
+                    { label: "Qualified", value: "Qualified" },
+                    { label: "Lost", value: "Lost" },
+                  ]}
+                  onChange={(value) => {
+                    setStatusFilter(value);
                     setPage(1);
                   }}
-                  className="border px-3 py-2 rounded-lg w-full sm:w-48"
-                >
-                  <option value="All">All Statuses</option>
-                  <option value="New">New</option>
-                  <option value="Contacted">Contacted</option>
-                  <option value="Qualified">Qualified</option>
-                  <option value="Lost">Lost</option>
-                </select>
+                />
 
                 <button
                   onClick={() => setSortDir(sortDir === "asc" ? "desc" : "asc")}
-                  className="border px-4 py-2 rounded-lg w-full sm:w-auto"
+                  className="rounded-xl px-4 h-[52px] flex items-center justify-between cursor-pointer
+        border bg-white text-gray-800
+        dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700"
                 >
                   Date {sortDir === "asc" ? "↑" : "↓"}
                 </button>
@@ -152,24 +159,24 @@ export default function LeadsListPage() {
               {/* Desktop Table */}
               <div className="hidden md:block overflow-x-auto border rounded-xl">
                 <table className="w-full text-sm">
-                  <thead className="border-b hover:bg-gray-lighter dark:hover:bg-gray-100 transition">
+                  <thead className="border-b">
                     <tr>
-                      <th className="p-3 text-left text-white dark:text-gray-600">
+                      <th className="p-3 text-left dark:text-white text-black">
                         Name
                       </th>
-                      <th className="p-3 text-left text-white dark:text-gray-600">
+                      <th className="p-3 text-left text-gray-700 dark:text-gray-300">
                         Phone
                       </th>
-                      <th className="p-3 text-left text-white dark:text-gray-600">
+                      <th className="p-3 text-left text-gray-700 dark:text-gray-300">
                         Source
                       </th>
-                      <th className="p-3 text-left text-white dark:text-gray-600">
+                      <th className="p-3 text-left text-gray-700 dark:text-gray-300">
                         Status
                       </th>
-                      <th className="p-3 text-left text-white dark:text-gray-600">
+                      <th className="p-3 text-left text-gray-700 dark:text-gray-300">
                         Created
                       </th>
-                      <th className="p-3 text-right text-white dark:text-gray-600">
+                      <th className="p-3 text-right text-gray-700 dark:text-gray-300">
                         Actions
                       </th>
                     </tr>
@@ -178,24 +185,24 @@ export default function LeadsListPage() {
                     {paginated.map((lead) => (
                       <tr
                         key={lead.id}
-                        className="border-b hover:bg-gray-lighter dark:hover:bg-gray-700 transition"
+                        className="border-b hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                       >
                         <td className="px-4 py-3 font-medium">
-                          <div className="flex flex-col text-white dark:text-gray-600">
+                          <div className="flex flex-col text-gray-700 dark:text-gray-300">
                             <span>{lead.name}</span>
                             <span className="text-[12px]">{lead.company}</span>
                           </div>
                         </td>
-                        <td className="px-4 py-3 text-white dark:text-gray-600">
+                        <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                           {lead.phone}
                         </td>
-                        <td className="px-4 py-3 text-white dark:text-gray-600">
+                        <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                           {lead.source}
                         </td>
                         <td className="px-4 py-3">
                           <StatusBadge status={lead.status} />
                         </td>
-                        <td className="px-4 py-3 text-white dark:text-gray-600">
+                        <td className="px-4 py-3 text-gray-700 dark:text-gray-300">
                           {new Date(lead.createdAt).toLocaleDateString()}
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -246,13 +253,19 @@ export default function LeadsListPage() {
                     className="border rounded-xl p-4 shadow-sm bg-white dark:bg-gray-800"
                   >
                     <div className="flex justify-between items-center mb-2">
-                      <h2 className="font-semibold">{lead.name}</h2>
+                      <h2 className="font-semibold text-gray-700 dark:text-gray-300">
+                        {lead.name}
+                      </h2>
                       <StatusBadge status={lead.status} />
                     </div>
 
-                    <p className="text-sm text-gray-600">{lead.phone}</p>
-                    <p className="text-sm text-gray-500">{lead.source}</p>
-                    <p className="text-xs text-gray-400 mt-1">
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {lead.phone}
+                    </p>
+                    <p className="text-sm text-gray-700 dark:text-gray-300">
+                      {lead.source}
+                    </p>
+                    <p className="text-xs text-gray-700 dark:text-gray-300 mt-1">
                       {new Date(lead.createdAt).toLocaleDateString()}
                     </p>
 
@@ -263,23 +276,28 @@ export default function LeadsListPage() {
                       >
                         View
                       </button>
-                      <button
-                        onClick={() => {
-                          setSelectedLead(lead);
-                          setModalOpen(true);
-                        }}
-                        className="text-green-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={async () => {
-                          await deleteLead(Number(lead.id));
-                        }}
-                        className="text-red-600"
-                      >
-                        Delete
-                      </button>
+                      {role === "admin" ? (
+                        <>
+                          {" "}
+                          <button
+                            onClick={() => {
+                              setSelectedLead(lead);
+                              setModalOpen(true);
+                            }}
+                            className="text-green-600"
+                          >
+                            Edit
+                          </button>
+                          <button
+                            onClick={async () => {
+                              await deleteLead(Number(lead.id));
+                            }}
+                            className="text-red-600"
+                          >
+                            Delete
+                          </button>
+                        </>
+                      ) : null}
                     </div>
                   </div>
                 ))}
@@ -287,7 +305,7 @@ export default function LeadsListPage() {
 
               {totalPages > 1 && (
                 <div className="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3">
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-700 dark:text-gray-300">
                     Page {page} of {totalPages}
                   </p>
 
@@ -295,7 +313,7 @@ export default function LeadsListPage() {
                     <button
                       onClick={() => setPage((p) => Math.max(1, p - 1))}
                       disabled={page === 1}
-                      className="px-4 py-2 border rounded disabled:opacity-40"
+                      className="px-4 py-2 border rounded disabled:opacity-40 text-gray-700 dark:text-gray-300"
                     >
                       Prev
                     </button>
@@ -305,7 +323,7 @@ export default function LeadsListPage() {
                         setPage((p) => Math.min(totalPages, p + 1))
                       }
                       disabled={page === totalPages}
-                      className="px-4 py-2 border rounded disabled:opacity-40"
+                      className="px-4 py-2 border rounded disabled:opacity-40 text-gray-700 dark:text-gray-300"
                     >
                       Next
                     </button>
