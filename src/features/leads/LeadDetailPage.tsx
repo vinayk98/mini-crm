@@ -118,7 +118,7 @@ export default function LeadDetailPage() {
                   <p className="text-sm text-gray-500 dark:text-gray-400">
                     Email
                   </p>
-                  <p className="text-gray-900 dark:text-gray-100">
+                  <p className="text-sm sm:text-base text-gray-900 dark:text-gray-100 truncate">
                     {lead.email}
                   </p>
                 </div>
@@ -240,9 +240,9 @@ export default function LeadDetailPage() {
                       <div
                         key={f.id}
                         className="
-                      border border-gray-200 dark:border-gray-700
-                      bg-white dark:bg-gray-800
-                      p-3 rounded-xl flex justify-between items-center
+                      border-[2px] border-gray-200 dark:border-gray-700
+                      bg-white dark:bg-gray-800 px-5
+                      py-3 rounded-xl flex justify-between items-center
                     "
                       >
                         <div>
