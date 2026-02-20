@@ -2,8 +2,8 @@ import { useState, useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { StatusBadge } from "../../components/StatusBadge";
 import DashboardLayout from "../../components/DashboardLayout";
-import type { Lead } from "../../types/lead";
-import { createLead, updateLead } from "../../services/leadService";
+import type { Lead as StoreLead } from "../../store/leadStore";
+import { useLeadStore } from "../../store/leadStore";
 import { BsEyeFill, BsPencilSquare, BsTrash3Fill } from "react-icons/bs";
 import LeadModal from "../../components/LeadFormData";
 import type { LeadFormData } from "../../types/leadFormData";
@@ -11,23 +11,22 @@ import type { LeadFormData } from "../../types/leadFormData";
 const PAGE_SIZE = 10;
 export default function LeadsListPage() {
   const navigate = useNavigate();
-  const [leads, setLeads] = useState<Lead[]>([]);
+  const leads = useLeadStore((s) => s.leads);
+  const fetchLeads = useLeadStore((s) => s.fetchLeads);
+  const addLead = useLeadStore((s) => s.addLead);
+  const updateLead = useLeadStore((s) => s.updateLead);
+  const deleteLead = useLeadStore((s) => s.deleteLead);
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
+  const [selectedLead, setSelectedLead] = useState<StoreLead | null>(null);
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("All");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(true);
+  const loading = useLeadStore((s) => s.loading);
 
   useEffect(() => {
-    fetch("http://localhost:3001/leads")
-      .then((res) => res.json())
-      .then((data) => {
-        setLeads(data);
-        setLoading(false);
-      })
-      .catch(() => setLoading(false));
+    fetchLeads();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // ✅ Filtering + Sorting
@@ -58,27 +57,21 @@ export default function LeadsListPage() {
     try {
       if (selectedLead) {
         // update existing lead
-        const payload: Partial<Lead> = {
+        const payload: Partial<StoreLead> = {
           ...selectedLead,
           ...formData,
           assignedTo:
             Number(formData.assignedTo) || selectedLead.assignedTo || 1,
         };
-
-        const updated = await updateLead(Number(selectedLead.id), payload);
-        setLeads((prev) =>
-          prev.map((l) => (l.id === updated.id ? updated : l)),
-        );
+        await updateLead(Number(selectedLead.id), payload);
       } else {
         // CREATE
-        const payload: Omit<Lead, "id"> = {
+        const payload: Omit<StoreLead, "id"> = {
           ...formData,
           createdAt: new Date().toISOString(),
           assignedTo: Number(formData.assignedTo) || 1,
-        } as Omit<Lead, "id">;
-
-        const created = await createLead(payload);
-        setLeads((prev) => [created, ...prev]);
+        } as Omit<StoreLead, "id">;
+        await addLead(payload);
       }
     } catch (err) {
       console.error("Failed to save lead", err);
@@ -219,13 +212,7 @@ export default function LeadsListPage() {
                             </button>
                             <button
                               onClick={async () => {
-                                await fetch(
-                                  `http://localhost:3001/leads/${lead.id}`,
-                                  { method: "DELETE" },
-                                );
-                                setLeads((prev) =>
-                                  prev.filter((l) => l.id !== lead.id),
-                                );
+                                await deleteLead(Number(lead.id));
                               }}
                               className="text-red-600 hover:text-red-800 transition"
                               title="Delete"
@@ -276,13 +263,7 @@ export default function LeadsListPage() {
                       </button>
                       <button
                         onClick={async () => {
-                          await fetch(
-                            `http://localhost:3001/leads/${lead.id}`,
-                            { method: "DELETE" },
-                          );
-                          setLeads((prev) =>
-                            prev.filter((l) => l.id !== lead.id),
-                          );
+                          await deleteLead(Number(lead.id));
                         }}
                         className="text-red-600"
                       >
