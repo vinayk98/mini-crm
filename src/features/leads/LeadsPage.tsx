@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { StatusBadge } from "../../components/StatusBadge";
 import DashboardLayout from "../../components/DashboardLayout";
@@ -10,10 +10,18 @@ import type { LeadFormData } from "../../types/leadFormData";
 import CustomSelect from "../../components/CustomSelect";
 
 const PAGE_SIZE = 10;
+
+const STATUS_OPTIONS = [
+  { label: "All Statuses", value: "All" },
+  { label: "New", value: "New" },
+  { label: "Contacted", value: "Contacted" },
+  { label: "Qualified", value: "Qualified" },
+  { label: "Lost", value: "Lost" },
+];
 export default function LeadsListPage() {
   const navigate = useNavigate();
   const leads = useLeadStore((s) => s.leads);
-  const role = localStorage.getItem("role");
+  const role = useMemo(() => localStorage.getItem("role"), []);
   const fetchLeads = useLeadStore((s) => s.fetchLeads);
   const addLead = useLeadStore((s) => s.addLead);
   const updateLead = useLeadStore((s) => s.updateLead);
@@ -29,8 +37,7 @@ export default function LeadsListPage() {
 
   useEffect(() => {
     fetchLeads();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchLeads]);
 
   // debounce query -> search (300ms)
   useEffect(() => {
@@ -38,17 +45,59 @@ export default function LeadsListPage() {
     return () => clearTimeout(t);
   }, [query]);
 
+  const handleOpenNew = useCallback(() => {
+    setSelectedLead(null);
+    setModalOpen(true);
+  }, []);
+
+  const handleEdit = useCallback((lead: StoreLead) => {
+    setSelectedLead(lead);
+    setModalOpen(true);
+  }, []);
+
+  const handleView = useCallback(
+    (id: string) => {
+      navigate(`/leads/${id}`);
+    },
+    [navigate],
+  );
+
+  const handleDelete = useCallback(
+    async (id: string) => {
+      await deleteLead(id);
+    },
+    [deleteLead],
+  );
+
+  const handleSearchChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      setQuery(e.target.value);
+      setPage(1);
+    },
+    [],
+  );
+
+  const handleStatusChange = useCallback((value: string) => {
+    setStatusFilter(value);
+    setPage(1);
+  }, []);
+
+  const handleSortToggle = useCallback(() => {
+    setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+  }, []);
+
   const filtered = useMemo(() => {
     let result = [...leads];
 
     if (statusFilter !== "All") {
-      result = result.filter((l) => l.status === statusFilter?.toLowerCase());
+      const sf = statusFilter.toLowerCase();
+      result = result.filter((l) => l.status?.toLowerCase() === sf);
     }
 
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
-        (l) => l.name.toLowerCase().includes(q) || l.phone.includes(q),
+        (l) => l.name?.toLowerCase().includes(q) || l.phone?.includes(q),
       );
     }
 
@@ -71,7 +120,7 @@ export default function LeadsListPage() {
           assignedTo:
             Number(formData.assignedTo) || selectedLead.assignedTo || 1,
         };
-        await updateLead(Number(selectedLead.id), payload);
+        await updateLead(selectedLead.id, payload);
       } else {
         // CREATE
         const payload: Omit<StoreLead, "id"> = {
@@ -89,8 +138,15 @@ export default function LeadsListPage() {
     }
   };
 
-  const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
-  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filtered.length / PAGE_SIZE)),
+    [filtered],
+  );
+
+  const paginated = useMemo(
+    () => filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
+    [filtered, page],
+  );
 
   if (loading) return <div className="p-6">Loading leads...</div>;
 
@@ -107,10 +163,7 @@ export default function LeadsListPage() {
 
                 {role === "admin" ? (
                   <button
-                    onClick={() => {
-                      setSelectedLead(null);
-                      setModalOpen(true);
-                    }}
+                    onClick={handleOpenNew}
                     className="w-full sm:w-auto bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
                   >
                     + New Lead
@@ -122,10 +175,7 @@ export default function LeadsListPage() {
                   type="text"
                   placeholder="Search name or phone..."
                   value={query}
-                  onChange={(e) => {
-                    setQuery(e.target.value);
-                    setPage(1);
-                  }}
+                  onChange={handleSearchChange}
                   className="rounded-xl px-4 h-[52px] flex items-center justify-between cursor-pointer
         border bg-white text-gray-800
         dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700"
@@ -133,24 +183,13 @@ export default function LeadsListPage() {
                 <CustomSelect
                   value={statusFilter}
                   className="w-full sm:w-48"
-                  options={[
-                    { label: "All Statuses", value: "All" },
-                    { label: "New", value: "New" },
-                    { label: "Contacted", value: "Contacted" },
-                    { label: "Qualified", value: "Qualified" },
-                    { label: "Lost", value: "Lost" },
-                  ]}
-                  onChange={(value) => {
-                    setStatusFilter(value);
-                    setPage(1);
-                  }}
+                  options={STATUS_OPTIONS}
+                  onChange={handleStatusChange}
                 />
 
                 <button
-                  onClick={() => setSortDir(sortDir === "asc" ? "desc" : "asc")}
-                  className="rounded-xl px-4 h-[52px] flex items-center justify-between cursor-pointer
-        border bg-white text-gray-800
-        dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700"
+                  onClick={handleSortToggle}
+                  className="rounded-xl px-4 h-[52px] flex items-center justify-between cursor-pointer border bg-white text-gray-800 dark:bg-gray-900 dark:text-gray-200 dark:border-gray-700"
                 >
                   Date {sortDir === "asc" ? "↑" : "↓"}
                 </button>
@@ -208,7 +247,7 @@ export default function LeadsListPage() {
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end items-center gap-4">
                             <button
-                              onClick={() => navigate(`/leads/${lead.id}`)}
+                              onClick={() => handleView(lead.id)}
                               className="text-blue-600 hover:text-blue-800 transition"
                               title="View"
                             >
@@ -217,19 +256,14 @@ export default function LeadsListPage() {
                             {role === "admin" ? (
                               <>
                                 <button
-                                  onClick={() => {
-                                    setSelectedLead(lead);
-                                    setModalOpen(true);
-                                  }}
+                                  onClick={() => handleEdit(lead)}
                                   className="text-green-600 hover:text-green-800 transition"
                                   title="Edit"
                                 >
                                   <BsPencilSquare size={18} />
                                 </button>
                                 <button
-                                  onClick={async () => {
-                                    await deleteLead(Number(lead.id));
-                                  }}
+                                  onClick={() => handleDelete(lead.id)}
                                   className="text-red-600 hover:text-red-800 transition"
                                   title="Delete"
                                 >
@@ -271,27 +305,21 @@ export default function LeadsListPage() {
 
                     <div className="flex justify-between mt-3 text-sm">
                       <button
-                        onClick={() => navigate(`/leads/${lead.id}`)}
+                        onClick={() => handleView(lead.id)}
                         className="text-blue-600"
                       >
                         View
                       </button>
                       {role === "admin" ? (
                         <>
-                          {" "}
                           <button
-                            onClick={() => {
-                              setSelectedLead(lead);
-                              setModalOpen(true);
-                            }}
+                            onClick={() => handleEdit(lead)}
                             className="text-green-600"
                           >
                             Edit
                           </button>
                           <button
-                            onClick={async () => {
-                              await deleteLead(Number(lead.id));
-                            }}
+                            onClick={() => handleDelete(lead.id)}
                             className="text-red-600"
                           >
                             Delete

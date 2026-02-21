@@ -86,7 +86,7 @@ export default function LeadDetailPage() {
     }
   };
 
-  const handleMarkDone = async (fid: number | string) => {
+  const handleMarkDone = async (fid: string) => {
     if (!id) return;
     try {
       await markFollowupDone(fid, id);
@@ -165,14 +165,7 @@ export default function LeadDetailPage() {
                     value={noteText}
                     onChange={(e) => setNoteText(e.target.value)}
                     placeholder="Add note"
-                    className="
-                  w-full border-2 rounded-xl py-3 px-5
-                  bg-white dark:bg-gray-800
-                  text-gray-900 dark:text-gray-100
-                  border-gray-200 dark:border-gray-700
-                  focus:outline-none
-                  focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
-                "
+                    className="w-full border-2 rounded-xl py-3 px-5 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   />
 
                   <button
@@ -186,23 +179,32 @@ export default function LeadDetailPage() {
                   </button>
 
                   <div className="mt-4 space-y-3">
-                    {notes.map((note) => (
-                      <div
-                        key={note.id}
-                        className="
-                      border-2 border-gray-200 dark:border-gray-700
-                      bg-white dark:bg-gray-800
-                      py-3 px-5 rounded-xl
-                    "
-                      >
-                        <p className="text-gray-900 dark:text-gray-100 text-[12px]">
-                          {lead.name}
-                          {note?.createdAt &&
-                            ` — ${formatDateTime(note.createdAt)}`}
-                        </p>
-                        {note.content}
-                      </div>
-                    ))}
+                    {notes
+                      .slice()
+                      .sort((a, b) => {
+                        const dateA = a.createdAt
+                          ? new Date(a.createdAt).getTime()
+                          : 0;
+                        const dateB = b.createdAt
+                          ? new Date(b.createdAt).getTime()
+                          : 0;
+                        return dateB - dateA;
+                      })
+                      .map((note) => (
+                        <div
+                          key={note.id}
+                          className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 py-3 px-5 rounded-xl"
+                        >
+                          <p className="text-gray-900 dark:text-gray-100 text-[12px]">
+                            {lead.name}
+                            {note.createdAt &&
+                              ` — ${formatDateTime(note.createdAt)}`}
+                          </p>
+                          <p className="text-gray-800 dark:text-gray-200 text-sm mt-1">
+                            {note.content}
+                          </p>
+                        </div>
+                      ))}
                   </div>
                 </div>
               )}
@@ -210,21 +212,14 @@ export default function LeadDetailPage() {
               {/* Followups Tab */}
               {activeTab === "followups" && (
                 <div>
+                  {/* Date Input & Schedule Button */}
                   <input
                     type="date"
                     value={followUpDate}
                     min={new Date().toISOString().split("T")[0]}
                     onChange={(e) => setFollowUpDate(e.target.value)}
-                    className="
-                  w-full border-2 rounded-xl py-3 px-5
-                  bg-white dark:bg-gray-800
-                  text-gray-900 dark:text-gray-100
-                  border-gray-200 dark:border-gray-700
-                  focus:outline-none
-                  focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400
-                "
+                    className="w-full border-2 rounded-xl py-3 px-5 bg-white dark:bg-gray-800  text-gray-900 dark:text-gray-100 border-gray-200 dark:border-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400"
                   />
-
                   <button
                     onClick={handleAddFollowUp}
                     disabled={followUpLoading}
@@ -234,31 +229,59 @@ export default function LeadDetailPage() {
                   >
                     {followUpLoading ? "Scheduling…" : "Schedule"}
                   </button>
-
-                  <div className="mt-4 space-y-3">
-                    {followups.map((f) => (
-                      <div
-                        key={f.id}
-                        className="
-                      border-[2px] border-gray-200 dark:border-gray-700
-                      bg-white dark:bg-gray-800 px-5
-                      py-3 rounded-xl flex justify-between items-center
-                    "
-                      >
-                        <div>
-                          {f.date} — {f.status}
-                        </div>
-
-                        {f.status !== "completed" && (
-                          <button
-                            onClick={() => handleMarkDone(f.id)}
-                            className="text-green-600 dark:text-green-400"
+                  <div className="mt-6">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                      Pending Follow-ups
+                    </h2>
+                    <div className="space-y-3">
+                      {followups.filter((f) => f.status !== "completed")
+                        .length === 0 && (
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                          No pending follow-ups
+                        </p>
+                      )}
+                      {followups
+                        .filter((f) => f.status !== "completed")
+                        .map((f) => (
+                          <div
+                            key={f.id}
+                            className="border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 px-5 py-3 rounded-xl flex justify-between items-center"
                           >
-                            Mark Done
-                          </button>
-                        )}
-                      </div>
-                    ))}
+                            <div>{f.date}</div>
+                            <button
+                              onClick={() => handleMarkDone(f.id)}
+                              className="text-green-600 dark:text-green-400"
+                            >
+                              Mark Done
+                            </button>
+                          </div>
+                        ))}
+                    </div>
+                  </div>
+
+                  {/* Completed Follow-ups */}
+                  <div className="mt-6">
+                    <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-100 mb-2">
+                      Completed Follow-ups
+                    </h2>
+                    <div className="space-y-3">
+                      {followups.filter((f) => f.status === "completed")
+                        .length === 0 && (
+                        <p className="text-gray-500 dark:text-gray-400 text-sm">
+                          No completed follow-ups yet
+                        </p>
+                      )}
+                      {followups
+                        .filter((f) => f.status === "completed")
+                        .map((f) => (
+                          <div
+                            key={f.id}
+                            className="border-2 border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 px-5 py-3 rounded-xl"
+                          >
+                            <div>{f.date}</div>
+                          </div>
+                        ))}
+                    </div>
                   </div>
                 </div>
               )}

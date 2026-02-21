@@ -18,10 +18,10 @@ interface LeadState {
   error: string | null;
 
   fetchLeads: () => Promise<void>;
-  fetchLeadById: (id: number | string) => Promise<void>;
+  fetchLeadById: (id: string) => Promise<void>;
   addLead: (lead: Omit<Lead, "id">) => Promise<void>;
-  updateLead: (id: number | string, updated: Partial<Lead>) => Promise<void>;
-  deleteLead: (id: number | string) => Promise<void>;
+  updateLead: (id: string, updated: Partial<Lead>) => Promise<void>;
+  deleteLead: (id: string) => Promise<void>;
   clearSelected: () => void;
 }
 
@@ -68,7 +68,7 @@ export const useLeadStore = create<LeadState>()(
 
         updateLead: async (id, updated) => {
           try {
-            await svcUpdateLead(Number(id), updated as Partial<ApiLead>);
+            await svcUpdateLead(id, updated as Partial<ApiLead>);
             await get().fetchLeads();
             await get().fetchLeadById(id);
           } catch (err) {
@@ -77,9 +77,9 @@ export const useLeadStore = create<LeadState>()(
           }
         },
 
-        deleteLead: async (id) => {
+        deleteLead: async (id: string) => {
           try {
-            await svcDeleteLead(Number(id));
+            await svcDeleteLead(id);
             await get().fetchLeads();
           } catch (err) {
             console.error(err);

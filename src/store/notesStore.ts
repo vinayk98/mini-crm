@@ -3,18 +3,19 @@ import { devtools } from "zustand/middleware";
 import { getAllNotes, createNote } from "../services/notePage";
 
 export interface Note {
-  id: number | string;
-  leadId: number | string;
+  id: string;
+  leadId: string;
   content: string;
   createdBy: number;
   createdAt?: string;
 }
+
 interface NotesState {
   notes: Note[];
   loading: boolean;
   error: string | null;
 
-  fetchNotes: (leadId: number | string) => Promise<void>;
+  fetchNotes: (leadId: string) => Promise<void>;
   addNote: (data: Omit<Note, "id" | "createdAt">) => Promise<Note | void>;
   clear: () => void;
 }
@@ -57,9 +58,7 @@ export const useNotesStore = create<NotesState>()(
           createdAt: new Date().toISOString(),
         });
 
-        set((state) => ({
-          notes: [...state.notes, created],
-        }));
+        set((state) => ({ notes: [...state.notes, created] }));
 
         return created;
       } catch (err) {
@@ -68,10 +67,6 @@ export const useNotesStore = create<NotesState>()(
       }
     },
 
-    clear: () =>
-      set({
-        notes: [],
-        error: null,
-      }),
+    clear: () => set({ notes: [], error: null }),
   })),
 );
