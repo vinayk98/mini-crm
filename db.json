@@ -11019,8 +11019,65 @@
       "source": "Referral",
       "assignedTo": 1,
       "createdAt": "2026-02-20T16:12:21.270Z"
+    },
+    {
+      "id": "dfec",
+      "name": "alextor cook Junior",
+      "phone": "9099520147",
+      "email": "alexter02@gmail.com",
+      "company": "Acme Corp",
+      "status": "New",
+      "source": "Referral",
+      "assignedTo": 1,
+      "createdAt": "2026-02-21T04:36:30.593Z"
+    },
+    {
+      "id": "1fcf",
+      "name": "alextor cook",
+      "phone": "9887667887",
+      "email": "alex100@gmail.com",
+      "company": "TechNova Pvt Ltd",
+      "status": "Contacted",
+      "source": "Referral",
+      "assignedTo": 1,
+      "createdAt": "2026-02-21T04:37:56.809Z"
     }
   ],
-  "notes": [],
-  "followups": []
+  "notes": [
+    {
+      "id": "149f",
+      "leadId": "87e7",
+      "content": "Interested in monthly subscription plan, decision maker is CTO, mentioned competitors like Zoho and HubSpot.",
+      "createdBy": 1,
+      "createdAt": "2026-02-21T04:29:12.543Z"
+    },
+    {
+      "id": "3882",
+      "leadId": "87e7",
+      "content": "Interested in monthly subscription plan, decision maker is CTO, mentioned competitors like Zoho and HubSpot.",
+      "createdBy": 1,
+      "createdAt": "2026-02-21T04:29:21.426Z"
+    },
+    {
+      "id": "faca",
+      "leadId": "87e7",
+      "content": "Interested in monthly subscription plan, decision maker is CTO, mentioned competitors like Zoho and HubSpot.",
+      "createdBy": 1,
+      "createdAt": "2026-02-21T04:34:03.011Z"
+    }
+  ],
+  "followups": [
+    {
+      "id": "0204",
+      "leadId": "87e7",
+      "date": "2026-02-26",
+      "status": "pending"
+    },
+    {
+      "id": "0b2b",
+      "leadId": "87e7",
+      "date": "2026-02-24",
+      "status": "completed"
+    }
+  ]
 }

@@ -21,7 +21,7 @@ export const getLeads = async (params?: {
   return res.data;
 };
 
-export const getLeadById = async (id: number | string): Promise<Lead> => {
+export const getLeadById = async (id: string): Promise<Lead> => {
   const res = await api.get(`/leads/${id}`);
   return res.data;
 };
@@ -32,13 +32,13 @@ export const createLead = async (data: Omit<Lead, "id">): Promise<Lead> => {
 };
 
 export const updateLead = async (
-  id: number,
+  id: string,
   data: Partial<Lead>,
 ): Promise<Lead> => {
   const res = await api.put(`/leads/${id}`, data);
   return res.data;
 };
 
-export const deleteLead = async (id: number): Promise<void> => {
+export const deleteLead = async (id: string): Promise<void> => {
   await api.delete(`/leads/${id}`);
 };

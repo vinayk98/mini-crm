@@ -152,7 +152,6 @@ export default function DashboardLayout({ children }: LayoutProps) {
           sidebarFg={sidebarFg}
           sidebarHover={sidebarHover}
           sidebarActive={sidebarActive}
-          onNavClick={() => setSidebarOpen(false)}
           crm_theme={crm_theme}
           toggleTheme={toggleTheme}
           isActive={isActive}
@@ -178,7 +177,6 @@ export default function DashboardLayout({ children }: LayoutProps) {
               sidebarFg={sidebarFg}
               sidebarHover={sidebarHover}
               sidebarActive={sidebarActive}
-              onNavClick={() => setSidebarOpen(false)}
               crm_theme={crm_theme}
               toggleTheme={toggleTheme}
               isActive={isActive}

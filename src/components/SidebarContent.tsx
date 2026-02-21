@@ -4,7 +4,6 @@ interface SidebarContentProps {
   sidebarFg: string;
   sidebarHover: string;
   sidebarActive: string;
-  onNavClick: () => void;
   isActive: (to: string) => boolean;
   handleLogout?: () => void;
   crm_theme: string;
@@ -19,7 +18,6 @@ function SidebarContent({
   sidebarFg,
   sidebarHover,
   sidebarActive,
-  onNavClick,
   isActive,
   handleLogout,
   crm_theme,
@@ -124,8 +122,6 @@ function SidebarContent({
             href={to}
             onClick={(e) => {
               e.preventDefault();
-              onNavClick();
-              window.location.href = to;
             }}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${isActive(to) ? sidebarActive : `${sidebarFg} ${sidebarHover}`} hover:no-underline block`}
           >

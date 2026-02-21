@@ -4,8 +4,8 @@ import { getAllFollowUps, createFollowUp } from "../services/followup";
 import { api } from "../services/api";
 
 export interface FollowUp {
-  id: number | string;
-  leadId: number | string;
+  id: string;
+  leadId: string;
   date: string;
   status: string;
   createdAt?: string;
